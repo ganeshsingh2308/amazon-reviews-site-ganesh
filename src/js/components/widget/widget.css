@@ -1,9 +1,19 @@
+.widgets {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  flex: 10;
+  box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+  border-radius: 5px;
+  height: 100px;
+}/*# sourceMappingURL=widget.css.map */
+
 .widget {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   padding: 10px;
-  flex: 1;
+  flex: 10;
   box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
-  border-radius: 10px;
+  border-radius: 5px;
   height: 100px;
 }/*# sourceMappingURL=widget.css.map */

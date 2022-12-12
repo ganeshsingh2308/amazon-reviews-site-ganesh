@@ -2,12 +2,8 @@
 
 const Widget = () => {
     return (
-        <div className="widget">
-            <div className="left">left</div>
-                <span className="totalReviews">Total Reviews: </span>
-            <div className="right">right</div>
-
-
+        <div>
+            <div>Custom column padding</div>
         </div>
     )
 }
@@ -21,7 +17,7 @@ ReactDOM.render(
     </div>,
     
 
-    document.getElementById('root')
+    document.getElementById('test2') = 'test'
 );
 
 
