@@ -11,8 +11,7 @@ from TEST_data_to_SQL_keyword import outputkeywordsort
 from table1FINAL_MYSQL1 import keywordtable
 from table1FINAL_MYSQL2 import keywordtable1
 from livereload import Server
-import time
-import json
+
 
 
 
@@ -535,9 +534,251 @@ def test8():
         return 'data1'
 
 
+@app.route("/test10")
+def index10():
+ 
+   try:
+    conn = mysql.connect()
+    conn.autocommit(True)
+    c = mysql.get_db().cursor()
+    # c = conn.cursor(buffered=True)
+    c.execute("SELECT * FROM productnames2")
+    names = c.fetchall()
+    conn.commit()
+    
+
+    if names:
+        pass
+
+    namelist = []
+
+    for count, name in enumerate(names):
+        newname = str(name)
+        size = len(newname)
+        newname = newname[1:]
+        mod_string = newname[:size - 3]
+        namelist.append(str(mod_string))
+    
+    
+    query = ''
+    newquery = ''
+    if  len(namelist) > 0:
+        query = "SELECT * FROM reviews1 WHERE "
+        productquery = " product=("
+        productquery2 = ")"
+
+        
+
+        if len(namelist) == 1:
+            newquery = productquery  + namelist[0] + productquery2
+
+        elif len(namelist) > 1:
+            for i in range(0,len(namelist)):
+              newquery += productquery  + namelist[i] + productquery2 
+              if i+1 != len(namelist):
+                newquery += "OR"
+
+
+        
+    
+    finalquery = query + newquery
+
+    conn = mysql.connect()
+    conn.autocommit(True)
+    c = mysql.get_db().cursor()
+            
+    c.execute(finalquery)
+
+    productname = list(c.fetchall())
+    
+    conn.commit()
+    positiveratingdict = {}
+    positiveratinglist = []
+
+    for i in productname:
+        date = str(i[2])
+        sentiment = str(i[4])
+        sentiment = ast.literal_eval(sentiment)
+        positiverating = 0
+        if float(sentiment['neg']) < float(sentiment['pos']):
+            positiverating = positiverating + 1
+        if date[23] == 'K':
+            date1 = date.replace("Reviewed in the United Kingdom ", "")
+            date2 = date1[2::]
+            date3 = date2.replace('on ','')
+            date4 = date3[3::]
+            date4 = date4.replace(' ','')
+        elif date[23] == 'S':
+            date1 = date.replace("Reviewed in the United States", "")
+            date2 = date1.replace('on ','')
+            year = date2[-4:]
+            month = []
+            counter  = 0
+            def convert(s):
+               str1 = ""
+               return(str1.join(s))
+
+            for j in date2:
+                counter = counter + 1
+                month.append(j)
+                if counter > 1 and j == ' ':
+                   break   
+            newmonth = convert(month)
+            if newmonth[0] == ' ':
+                newmonth1 = newmonth.replace(' ', '') 
+                            
+            totaldate = newmonth1 + year
+            date4 = totaldate
+
+        
+        counter = 0
+        for j in positiveratinglist:
+            counter = counter + 1
+            if j['date'] == date4:
+                counter = counter - 1
+                j['positivecomments'].append(positiverating)
+        if counter == len(positiveratinglist):
+            floatratinglist = []
+            floatratinglist.append(positiverating)
+            positiveratingdict = {'date':date4,'positivecomments':floatratinglist}
+            positiveratinglist.append(positiveratingdict)
+        
+    for i in positiveratinglist:
+        i['positivecomments'] = sum(i['positivecomments']) 
+            
+    
+    c.close()
+    def sort_vals(values):
+            months = {'January':1,'February':2,'March':3,'April':4,'May':5,'June':6,'July':7,'August':8,'September':9,'October':10,'November':11,'December':12}
+            return sorted(values, key = lambda x: [int(x['date'][-4:]),months[x['date'][:-4]]])
+    
+    return sort_vals(positiveratinglist)
+   except:
+    return 'test'
 
 
 
+@app.route("/test11")
+def index11():
+ 
+   try:
+    conn = mysql.connect()
+    conn.autocommit(True)
+    c = mysql.get_db().cursor()
+    # c = conn.cursor(buffered=True)
+    c.execute("SELECT * FROM productnames2")
+    names = c.fetchall()
+    conn.commit()
+    
+
+    if names:
+        pass
+
+    namelist = []
+
+    for count, name in enumerate(names):
+        newname = str(name)
+        size = len(newname)
+        newname = newname[1:]
+        mod_string = newname[:size - 3]
+        namelist.append(str(mod_string))
+    
+    
+    query = ''
+    newquery = ''
+    if  len(namelist) > 0:
+        query = "SELECT * FROM reviews1 WHERE "
+        productquery = " product=("
+        productquery2 = ")"
+
+        
+
+        if len(namelist) == 1:
+            newquery = productquery  + namelist[0] + productquery2
+
+        elif len(namelist) > 1:
+            for i in range(0,len(namelist)):
+              newquery += productquery  + namelist[i] + productquery2 
+              if i+1 != len(namelist):
+                newquery += "OR"
+
+
+        
+    
+    finalquery = query + newquery
+
+    conn = mysql.connect()
+    conn.autocommit(True)
+    c = mysql.get_db().cursor()
+            
+    c.execute(finalquery)
+
+    productname = list(c.fetchall())
+    
+    conn.commit()
+    negativeratingdict = {}
+    negativeratinglist = []
+
+    for i in productname:
+        date = str(i[2])
+        sentiment = str(i[4])
+        sentiment = ast.literal_eval(sentiment)
+        negativerating = 0
+        if float(sentiment['neg']) > float(sentiment['pos']):
+            negativerating = negativerating + 1
+        if date[23] == 'K':
+            date1 = date.replace("Reviewed in the United Kingdom ", "")
+            date2 = date1[2::]
+            date3 = date2.replace('on ','')
+            date4 = date3[3::]
+            date4 = date4.replace(' ','')
+        elif date[23] == 'S':
+            date1 = date.replace("Reviewed in the United States", "")
+            date2 = date1.replace('on ','')
+            year = date2[-4:]
+            month = []
+            counter  = 0
+            def convert(s):
+               str1 = ""
+               return(str1.join(s))
+
+            for j in date2:
+                counter = counter + 1
+                month.append(j)
+                if counter > 1 and j == ' ':
+                   break   
+            newmonth = convert(month)
+            if newmonth[0] == ' ':
+                newmonth1 = newmonth.replace(' ', '') 
+                            
+            totaldate = newmonth1 + year
+            date4 = totaldate
+
+        
+        counter = 0
+        for j in negativeratinglist:
+            counter = counter + 1
+            if j['date'] == date4:
+                counter = counter - 1
+                j['negativecomments'].append(negativerating)
+        if counter == len(negativeratinglist):
+            floatratinglist = []
+            floatratinglist.append(negativerating)
+            positiveratingdict = {'date':date4,'negativecomments':floatratinglist}
+            negativeratinglist.append(positiveratingdict)
+        
+    for i in negativeratinglist:
+        i['negativecomments'] = sum(i['negativecomments']) 
+            
+    
+    c.close()
+    def sort_vals(values):
+            months = {'January':1,'February':2,'March':3,'April':4,'May':5,'June':6,'July':7,'August':8,'September':9,'October':10,'November':11,'December':12}
+            return sorted(values, key = lambda x: [int(x['date'][-4:]),months[x['date'][:-4]]])
+    
+    return sort_vals(negativeratinglist)
+   except:
+    return 'test'
 
 
 
