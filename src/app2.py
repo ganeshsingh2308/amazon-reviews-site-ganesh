@@ -83,6 +83,131 @@ def process_json():
 
 
 
+@app.route("/vine", methods = ['GET', 'POST'])
+def process_vine():
+    
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json') and (request.method == 'POST'):
+        data = request.get_json(force=True, cache=True)
+        conn = mysql.connect()
+        conn.autocommit(True)
+        c = mysql.get_db().cursor()
+        c.execute("DELETE * FROM vine")
+        conn.commit()
+
+        c.execute("INSERT INTO vine (filter) VALUES (%s)",(data['vine']))
+        conn.commit()
+        
+        return 
+        
+    else:
+        return 'data1'
+
+
+@app.route("/vinecounter")
+def vinecounter():
+
+   try:
+    conn = mysql.connect()
+    conn.autocommit(True)
+    # c = conn.cursor(buffered=True)
+    c = mysql.get_db().cursor()
+    c.execute("SELECT * FROM productnames2")
+    names = c.fetchall()
+    conn.commit()
+    c.execute("SELECT * FROM marketplaces")
+    marketplaces = c.fetchall()
+    conn.commit()
+    
+
+    if names:
+        pass
+
+    namelist = []
+
+    for count, name in enumerate(names):
+        newname = str(name)
+        size = len(newname)
+        newname = newname[1:]
+        mod_string = newname[:size - 3]
+        namelist.append(str(mod_string))
+    
+    marketplacelist = []
+
+    for count, market in enumerate(marketplaces):
+        newmarket = str(market)
+        size1 = len(newmarket)
+        newmarket = newmarket[1:]
+        mod_string1 = newmarket[:size1 - 3]
+        marketplacelist.append(str(mod_string1))
+    
+    
+    query = ''
+    newquery = ''
+    if  len(namelist) > 0:
+        query = "SELECT * FROM reviews1 WHERE "
+        productquery = " product=("
+        marketplacequery = " marketplace=("
+        andquery = 'AND'
+        productquery2 = ")"
+
+        
+
+        if len(namelist) == 1:
+            newquery = productquery  + namelist[0] + productquery2
+
+        elif len(namelist) > 1:
+            for i in range(0,len(namelist)):
+              newquery += productquery  + namelist[i] + productquery2 
+              if i+1 != len(namelist):
+                newquery += "OR"
+
+
+        
+    
+    finalquery = query + newquery
+      
+    c.execute(finalquery)
+
+    reviews = list(c.fetchall())
+    
+    conn.commit()
+    mainlist = []
+
+    totalreviews = len(reviews)
+
+
+    ratinglist = []
+    poscounter = 0
+    negcounter = 0
+    for i in reviews:
+       rating = str(i[3])
+       floatrating = float(rating.replace(' out of 5 stars',''))
+       ratinglist.append(floatrating)
+       sentiment = str(i[4])
+       sentiment = ast.literal_eval(sentiment)
+       if float(sentiment['neg']) > float(sentiment['pos']):
+            negcounter = negcounter + 1
+       else:
+            poscounter = poscounter + 1
+        
+    averagerating = str(sum(ratinglist)/(totalreviews))
+
+    mainlist.append(str(totalreviews))
+    mainlist.append(poscounter)
+    mainlist.append(negcounter)
+    mainlist.append(averagerating)
+    c.close()
+
+    
+    return mainlist
+   except:
+    return 'test'
+
+
+
+
+
 
 
 #When the combination of products is selected then it will output a list of all the data for Number of reviews, average rating and positive/negative reviews
