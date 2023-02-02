@@ -1,29 +1,7 @@
-from googletrans import Translator, constants
-from pprint import pprint
 
-# init the Google API translator
+from google_trans_new import google_translator
 
-def translate(text):
-    translator = Translator()
+from deep_translator import GoogleTranslator
+translated = GoogleTranslator(source='auto', target='de').translate("keep it up, you are awesome")  # output -> Weiter so, du bist großartig
 
-    detection = translator.detect(text)
-    # print("Language code:", detection.lang)
-    # print("Confidence:", detection.confidence)
-    # print the detected language
-    detectedlanguage = constants.LANGUAGES[detection.lang]
-    # print("Language:", detectedlanguage)
-
-    if detectedlanguage != 'english':
-    # translate text to english text (by default)
-       translation = translator.translate(text)
-    #    print(f"{translation.origin} ({translation.src}) --> {translation.text} ({translation.dest})")
-       translatedtext = f"{translation.origin} ({translation.src}) --> {translation.text} ({translation.dest})"
-       return translatedtext
-    
-    else:
-        return text
-
-
-
-
-
+print(translated)

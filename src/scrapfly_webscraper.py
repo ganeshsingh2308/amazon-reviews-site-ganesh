@@ -1,10 +1,11 @@
 import asyncio
 import json
+import datetime
 import math
 import re
 from typing import List, Optional
 from urllib.parse import urljoin
-from translator import translate
+# from translator import translate
 from loguru import logger as log
 from scrapfly import ScrapeApiResponse, ScrapeConfig, ScrapflyClient
 from typing_extensions import TypedDict
@@ -34,7 +35,8 @@ def parse_reviews(result: ScrapeApiResponse):
         parsed.append(
             {
                 "product": productname,
-                "text": translate("".join(box.css("span[data-hook=review-body] ::text").getall()).strip()),
+                # "text": translate("".join(box.css("span[data-hook=review-body] ::text").getall()).strip()),
+                "text": "".join(box.css("span[data-hook=review-body] ::text").getall()).strip(),
                 "title": box.css("*[data-hook=review-title]>span::text").get(),
                 "location_and_date": box.css("span[data-hook=review-date] ::text").get(),
                 # "verified": bool(box.css("span[data-hook=avp-badge] ::text").get()),
@@ -45,8 +47,10 @@ def parse_reviews(result: ScrapeApiResponse):
     return parsed
 
 
-async def scrape_reviews(asin: str, session: ScrapflyClient, marketplace: str):
+async def scrape_reviews(asin: str, marketplace: str, session: ScrapflyClient):
     c = conn.cursor()
+    asin = 'B0BMB7QCND'
+    marketplace ='UK'
     """scrape all reviews of a given ASIN of an amazon product"""
     # need to change URL for UK ONE
     url = ''
@@ -75,20 +79,70 @@ async def scrape_reviews(asin: str, session: ScrapflyClient, marketplace: str):
     return reviews
 
 
-async def run():
+
+
+async def run(asin,marketplace):
     with ScrapflyClient(key="scp-live-8b481cd7ca0d4276be0ab7f45d8f1861", max_concurrency=2) as session:
-        product_result = await scrape_reviews(asin = "B0BJCNK9RM",marketplace = "USA", session=session)
+        asin = 'B0BMB7QCND'
+        marketplace ='United Kingdom'
+        product_result = await scrape_reviews(asin,marketplace, session=session)
+
 
         for product in product_result:
-            product1 = str(product["product"])
-            text = str(product["text"])
-            date = str(product["location_and_date"])
-            vine = str(product["vine"])
-            rating = str(product["rating"])
+            row = []
+            product1 = product["product"]
+            text = product["text"]
+            date = product["location_and_date"]
+
+            marketplace = ''
+            def remove_emoji(string):
+                return re.sub(r'[^\w\s,]', '', string)
+            no_emoji_string = remove_emoji(date)
+            match = re.search(r'(?i)in\s+(the\s+)?(\w+\s\w+)', no_emoji_string)
+            if match:
+                country = match.group(2)
+                if "on" in country:
+                    country = country.replace('on','')
+                marketplace = country
+            
+            index = date.find("on")
+            reviewStr = date.replace(",","")
+            reviewStr = reviewStr[index + 3::]
+            if reviewStr[0].isdigit() == False:
+               d = datetime.datetime.strptime(reviewStr, '%B %d %Y')
+               reviewStr = d.strftime("%d %B %Y")
+               print (d.strftime("%d %B %Y"))
+
+            
+            vine = product["vine"]
+            print(vine)
+            if vine is None:
+                vine = "Non-Verified"
+            if "VINE" in vine or "Vine" in vine:
+                vine = vine[:4]
+                vine = vine.lower()
+            # elif vine != "Verified Purchase":
+            #     vine = "Non-Verified"
+
+            rating = product["rating"]
             sent_1 = str(sentiment.polarity_scores(text))
+            print(vine)
+            row.append(product1)
+            row.append(text)
+            row.append(reviewStr)
+            row.append(marketplace)
+            row.append(rating)
+            row.append(sent_1)
+            row.append(vine)
+            print(row)
+            productlist = []
+            productlist.append(product1)
+
             c = conn.cursor()
-            c.execute("INSERT INTO reviews1 (product,review,date,rating,sentiment,vine) VALUES (%s,%s,%s,%s,%s,%s)",(product1, text, date, rating, sent_1, vine))
+            c.execute("INSERT INTO reviews2 (product, review, date, marketplace, rating, sentiment, vine) VALUES (%s, %s, %s, %s, %s, %s, %s)",(row))
             conn.commit()
+        c.execute("INSERT INTO productnames (product) VALUES (%s)",(productlist))
+        conn.commit()
         print(product_result)
         conn.close()
         c.close()
@@ -97,4 +151,4 @@ async def run():
 
 
 if __name__ == "__main__":
-    asyncio.run(run())
+    asyncio.run(run('B0BMB7QCND','United Kingdom'))

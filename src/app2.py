@@ -151,15 +151,26 @@ def vinecounter():
         andquery = 'AND'
         productquery2 = ")"
 
-        
+        if len(marketplacelist) ==  0 or len(marketplacelist) == 10:
+            elif len(namelist) > 1 and len(marketplacelist) > 1:
+            for i in range(0,len(marketplacelist)):
+              newquery += marketplacequery  + marketplacelist[0] + productquery2 
+              if i+1 != len(marketplacelist):
+                newquery += "OR"
 
-        if len(namelist) == 1:
-            newquery = productquery  + namelist[0] + productquery2
 
-        elif len(namelist) > 1:
-            for i in range(0,len(namelist)):
-              newquery += productquery  + namelist[i] + productquery2 
-              if i+1 != len(namelist):
+        if len(namelist) == 1 and len(marketplacelist) == 1:
+            newquery = productquery  + namelist[0] + productquery2 + andquery + marketplacequery + marketplacelist[0] + productquery2
+
+
+        elif len(namelist) > 1 and 10 > len(marketplacelist) > 1:
+            for i in range(0,len(marketplacelist)):
+              newquery += marketplacequery  + marketplacelist[0] + productquery2 
+              if i+1 != len(marketplacelist):
+                newquery += "OR"
+            for j in range(0,len(namelist)):
+              newquery += productquery  + namelist[j] + productquery2 
+              if j+1 != len(namelist):
                 newquery += "OR"
 
 
