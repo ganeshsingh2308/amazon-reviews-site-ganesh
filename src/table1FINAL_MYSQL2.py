@@ -4,9 +4,10 @@ import mysql.connector
 conn = mysql.connector.connect(host="localhost",user='root',password='root123',database='main') 
 
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from filterreviews import filter_reviews
 
 
-def keywordtable1(data,keywordlist):
+def keywordtable1(keywordlist):
     conn = mysql.connector.connect(host="localhost",user='root',password='root123',database='main') 
 
     sentiment = SentimentIntensityAnalyzer()
@@ -14,41 +15,14 @@ def keywordtable1(data,keywordlist):
     allreviews = []
 
     c = conn.cursor()
-
-
-
-    query = ''
-    newquery = ''
-    if  len(data) > 0:
-        query = "SELECT * FROM reviews1 WHERE "
-        productquery = " product=('"
-        productquery2 = "')"
-
-        
-
-        if len(data) == 1:
-            newquery = productquery  + data[0] + productquery2
-
-        elif len(data) > 1:
-            for i in range(0,len(data)):
-              newquery += productquery  + data[i] + productquery2 
-              if i+1 != len(data):
-                newquery += "OR"
-
-
-        
-    
-    finalquery = query + newquery
-
-    c.execute(finalquery)
-    reviews = c.fetchall()
+    reviews = filter_reviews()
     reviewcounter = 0
 
     
 
     for row in reviews:
         reviewcounter = reviewcounter + 1
-        review = {"product":row[0], "review":row[1], "date":row[2], "rating":row[3]}
+        review = {"product":row[0], "review":row[1], "date":row[2], "rating":row[4]}
         review1 = str(review['review'])
         # review2 = review1.lstrip(review1[0]).rstrip(review1[-1])
         print(review1)
@@ -71,10 +45,10 @@ def keywordtable1(data,keywordlist):
 
     for keyword in keywords:
         for row in reviews:
-            reviewlist = {"product":row[0], "review":row[1], "date":row[2], "rating":row[3]}
+            reviewlist = {"product":row[0], "review":row[1], "date":row[2], "rating":row[4]}
             if keyword in reviewlist['review']:
                 allreviews1.append(str(reviewlist['review']))
-                newrating = float(str(reviewlist['rating']).replace(' out of 5 stars', ''))
+                newrating = float(str(reviewlist['rating']))
                 ratinglist.append(newrating)
                 counter = counter + 1
             reviewlist = {}
@@ -91,7 +65,4 @@ def keywordtable1(data,keywordlist):
     conn.close()
     c.close()
     return 'test'
-
-
-
 

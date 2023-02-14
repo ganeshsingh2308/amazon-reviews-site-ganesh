@@ -1,6 +1,7 @@
 from wordwise import Extractor
 import mysql.connector
 import json
+from filterreviews import filter_reviews
 
 conn = mysql.connector.connect(host="localhost",user='root',password='root123',database='main') 
 
@@ -45,32 +46,7 @@ def allreviewtable(data):
        conn.commit()
 
 
-
-    query = ''
-    newquery = ''
-    if  len(data) > 0:
-        query = "SELECT * FROM reviews1 WHERE "
-        productquery = " product=('"
-        productquery2 = "')"
-
-        
-
-        if len(data) == 1:
-            newquery = productquery  + data[0] + productquery2
-
-        elif len(data) > 1:
-            for i in range(0,len(data)):
-              newquery += productquery  + data[i] + productquery2 
-              if i+1 != len(data):
-                newquery += "OR"
-
-
-        
-    
-    finalquery = query + newquery
-
-    c.execute(finalquery)
-    reviews = c.fetchall()
+    reviews = filter_reviews()
 
 
     reviewcounter = 0
@@ -79,7 +55,7 @@ def allreviewtable(data):
 
     for row in reviews:
         reviewcounter = reviewcounter + 1
-        review = {"product":row[0], "review":row[1], "date":row[2], "rating":row[3]}
+        review = {"product":row[0], "review":row[1], "date":row[2], "rating":row[4]}
         review1 = str(review['review'])
         # review2 = review1.lstrip(review1[0]).rstrip(review1[-1])
         
@@ -128,7 +104,7 @@ def allreviewtable(data):
             allreviewlist.append(reviewlist)
             if keyword in reviewlist['review']:
                 allreviews1.append(str(reviewlist['review']))
-                newrating = float(str(reviewlist['rating']).replace(' out of 5 stars', ''))
+                newrating = float(str(reviewlist['rating']))
                 ratinglist.append(newrating)
                 counter = counter + 1
             reviewlist = {}
@@ -147,6 +123,4 @@ def allreviewtable(data):
     conn.close()
     c.close()
     return allreviewlist
-
-
 

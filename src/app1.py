@@ -23,6 +23,7 @@ import datetime
 from collections import defaultdict
 from operator import itemgetter
 from datetime import datetime
+from filterreviews import filter_reviews
 
 
 # Configure application
@@ -90,112 +91,6 @@ def process_json():
 
 
 
-#When the combination of products is selected then it will output a list of all the data for Number of reviews, average rating and positive/negative reviews
-# @app.route("/test")
-# def index():
-
-#    try:
-#     conn = mysql.connect()
-#     conn.autocommit(True)
-#     # c = conn.cursor(buffered=True)
-#     c = mysql.get_db().cursor()
-#     c.execute("SELECT * FROM productnames2")
-#     names = c.fetchall()
-#     conn.commit()
-    
-
-#     if names:
-#         pass
-
-#     namelist = []
-
-#     for count, name in enumerate(names):
-#         newname = str(name)
-#         size = len(newname)
-#         newname = newname[1:]
-#         mod_string = newname[:size - 3]
-#         namelist.append(str(mod_string))
-    
-    
-#     query = ''
-#     newquery = ''
-#     if  len(namelist) > 0:
-#         query = "SELECT * FROM reviews2 WHERE "
-#         productquery = " product=("
-#         productquery2 = ")"
-
-        
-
-#         if len(namelist) == 1:
-#             newquery = productquery  + namelist[0] + productquery2
-
-#         elif len(namelist) > 1:
-#             for i in range(0,len(namelist)):
-#               newquery += productquery  + namelist[i] + productquery2 
-#               if i+1 != len(namelist):
-#                 newquery += "OR"
-
-
-        
-    
-#     finalquery = query + newquery
-      
-#     c.execute(finalquery)
-
-#     reviews = list(c.fetchall())
-    
-#     conn.commit()
-#     mainlist = []
-
-#     totalreviews = len(reviews)
-
-
-#     ratinglist = []
-#     poscounter = 0
-#     negcounter = 0
-#     for i in reviews:
-#        rating = str(i[3])
-#        floatrating = float(rating.replace(' out of 5 stars',''))
-#        ratinglist.append(floatrating)
-#        sentiment = str(i[4])
-#        sentiment = ast.literal_eval(sentiment)
-#        if float(sentiment['neg']) > float(sentiment['pos']):
-#             negcounter = negcounter + 1
-#        else:
-#             poscounter = poscounter + 1
-        
-#     averagerating = str(sum(ratinglist)/(totalreviews))
-
-#     posComments = 0
-#     #for index, element in enumerate(index11()):
-#     #    posComments += element["positivecomments"]
-#         #print (posComments)
-
-#     negComments = 0
-#     #for index, element in enumerate(index12()):
-#     #    negComments += element["negativecomments"]
-#         #print (negComments)
-
-#     mainlist.append(str(totalreviews))
-#     mainlist.append(poscounter)
-#     mainlist.append(negcounter)
-#     mainlist.append(averagerating)
-#     mainlist.append(posComments)
-#     mainlist.append(negComments)
-
-#     c.close()
-
-    
-#     return mainlist
-#    except:
-#     return 'test'
-
-
-
-
-
-
-
 
 #when the products are selected it outputs the names to the server and stores it in SQL
 @app.route("/test2",methods = ['GET', 'POST'])
@@ -208,10 +103,6 @@ def index2():
         
     else:
         return 'data1'
-
-
-
-
 
 
 
@@ -254,107 +145,7 @@ def index3():
 @app.route("/test4")
 def index4():
 
-
-
-   try:
-    conn = mysql.connect()
-    conn.autocommit(True)
-    # c = conn.cursor(buffered=True)
-    c = mysql.get_db().cursor()
-    c.execute("SELECT * FROM productnames2")
-    names = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM marketplace")
-    marketplaces = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM vine")
-    vines = c.fetchall()
-    conn.commit()
-    
-
-    if names:
-        pass
-
-    namelist = []
-    marketplacelist = []
-    vinelist = []
-
-    for count, name in enumerate(names):
-        newname = str(name)
-        size = len(newname)
-        newname = newname[1:]
-        mod_string = newname[:size - 3]
-        namelist.append(str(mod_string))
-
-    for count, marketplace in enumerate(marketplaces):
-        newmarketplace = str(marketplace)
-        size = len(newmarketplace)
-        newmarketplace = newmarketplace[1:]
-        mod_string = newmarketplace[:size - 3]
-        marketplacelist.append(str(mod_string))
-
-    for count, vine in enumerate(vines):
-        newvine = str(vine)
-        size = len(newvine)
-        newvine = newvine[1:]
-        mod_string = newvine[:size - 3]
-        vinelist.append(str(mod_string))
-    
-    
-    query = ''
-    newquery = ''
-    if  len(namelist) > 0:
-        query = "SELECT * FROM reviews2 WHERE "
-        productquery = "product=("
-        productquery2 = ")"
-        marketplacequery = "marketplace=("
-        vinequery = "vine=("
-        andquery = ") AND "
-
-        
-
-        #if len(namelist) == 1 and len(marketplacelist) == 1 and len(vinelist) == 1:
-        #    newquery = productquery  + namelist[0] + productquery2 + andquery + marketplacequery + marketplacelist[0] + productquery2 + andquery + vinequery + vinelist[0] + productquery2
-
-        if len(namelist) >= 1 and len(marketplacelist) >= 1 and len(vinelist) >= 1:
-            for i in range(0,len(namelist)):
-              if i == 0:
-                newquery += "("  
-              newquery += productquery  + namelist[i] + productquery2
-
-              if i+1 != len(namelist):
-                newquery += " OR "
-              if i+1 == len(namelist):
-                newquery += andquery
-            for i in range(0,len(marketplacelist)):
-              if i == 0:
-                newquery += "("
-              newquery += marketplacequery  + marketplacelist[i] + productquery2 
-              if i+1 != len(marketplacelist):
-                newquery += " OR "
-              if i+1 == len(marketplacelist):
-                newquery += andquery
-            for i in range(0,len(vinelist)):
-              if i == 0:
-                newquery += "("
-              newquery += vinequery  + vinelist[i] + productquery2 
-              if i+1 != len(vinelist):
-                newquery += " OR "
-              if i+1 == len(vinelist):
-                newquery += ")"
-              
-
-    print(namelist)      
-    print(vinelist)
-    print(marketplacelist)
-    #print(newquery)
-    finalquery = query + newquery
-    print(newquery)
-    print(finalquery)  
-    c.execute(finalquery)
-
-    reviews = list(c.fetchall())
-    #print(reviews)
+    reviews = filter_reviews()
     ratingdict = {}
     ratingdata = []
 
@@ -363,9 +154,11 @@ def index4():
         date = str(i[2])
         rating = str(i[4])
         product = str(i[0])
-        d = datetime.datetime.strptime(date, '%d %B %Y')
+        
+        d = datetime.strptime(date, '%d %B %Y')
+        
         formatteddate = (d.strftime("%B %Y"))
-        floatrating = float(rating.replace(' out of 5 stars',''))
+        floatrating = float(rating)
         counter = 0
         ratingdict = {'product': product, 'rating': floatrating, 'date': formatteddate}
         ratingdata.append(ratingdict)
@@ -377,7 +170,7 @@ def index4():
     for entry in ratingdata:
         product = entry['product']
         rating = entry['rating']
-        date = datetime.datetime.strptime(entry['date'], '%B %Y')
+        date = datetime.strptime(entry['date'], '%B %Y')
         month_year = date.strftime("%B %Y")
 
         if month_year not in results:
@@ -396,49 +189,11 @@ def index4():
             monthly_averages[product] = f"{sum(ratings) / len(ratings):.1f}"
         averages.append(monthly_averages)
 
-    averages.sort(key=lambda x: datetime.datetime.strptime(x['name'], '%B %Y'))
+    averages.sort(key=lambda x: datetime.strptime(x['name'], '%B %Y'))
     print(averages)
-    # conn.commit()
 
-
-    # productlist = []
-    # totalreviews = len(reviews)
-    # ratinglist = []
-    
-
-
-    # for i in reviews:
-    #    rating = str(i[4])
-    #    floatrating = float(rating.replace(' out of 5 stars',''))
-    #    ratinglist.append(floatrating)
-    #    sentiment = str(i[5])
-    #    sentiment = ast.literal_eval(sentiment)
-    #    if float(sentiment['neg']) > float(sentiment['pos']):
-    #         negcounter = negcounter + 1
-    #    else:
-    #         poscounter = poscounter + 1
-        
-    # averagerating = str(sum(ratinglist)/(totalreviews))
-
-    # posComments = 0
-    
-
-    # negComments = 0
-    
-
-    # mainlist.append(str(totalreviews))
-    # mainlist.append(poscounter)
-    # mainlist.append(negcounter)
-    # mainlist.append(averagerating)
-    # mainlist.append(posComments)
-    # mainlist.append(negComments)
-
-    c.close()
-
-    
     return averages
-   except:
-    return 'test'
+
     
  
    
@@ -500,8 +255,8 @@ def index10():
     mainlist = []
     mainsublist = {}
     if  len(namelist) > 0:
-        query = "SELECT * FROM reviews1 WHERE "
-        productquery = " product=("
+        query = "SELECT * FROM reviews2 WHERE "
+        productquery = "product=("
         productquery2 = ")"
 
         
@@ -511,40 +266,42 @@ def index10():
 
         elif len(namelist) > 1:
             for i in range(0,len(namelist)):
-                newquery = ''  
-                newquery += productquery  + namelist[i] + productquery2 
-                print(newquery)
+              if i == 0: 
+                newquery += "("
+              newquery += productquery  + namelist[i] + productquery2 
+                #print(newquery)
                
-                #if i+1 != len(namelist):
-                    #newquery += "OR"
-                finalquery = query + newquery
-      
-                c.execute(finalquery)
+              if i+1 != len(namelist):
+                    newquery += " OR "
+    finalquery = query + newquery + ")"
+    print(finalquery)  
+    c.execute(finalquery)
 
-                reviews = list(c.fetchall())
+    reviews = list(c.fetchall())
+    
                 
-                conn.commit()
+    conn.commit()
                 
-                totalreviews = len(reviews)
+    totalreviews = len(reviews)
 
 
-                ratinglist = []
-                poscounter = 0
-                negcounter = 0
-                for j in reviews:
-                    rating = str(j[3])
-                    floatrating = float(rating.replace(' out of 5 stars',''))
-                    ratinglist.append(floatrating)
-                    sentiment = str(j[4])
-                    sentiment = ast.literal_eval(sentiment)
-                    if float(sentiment['neg']) > float(sentiment['pos']):
-                            negcounter = negcounter + 1
-                    else:
-                            poscounter = poscounter + 1
+    ratinglist = []
+    poscounter = 0
+    negcounter = 0
+    for j in reviews:
+        rating = str(j[4])
+        floatrating = float(rating)
+        ratinglist.append(floatrating)
+        sentiment = str(j[5])
+        sentiment = ast.literal_eval(sentiment)
+        if float(sentiment['neg']) > float(sentiment['pos']):
+            negcounter = negcounter + 1
+        else:
+            poscounter = poscounter + 1
                 
                 
                     
-                averagerating = str(sum(ratinglist)/(totalreviews))
+    averagerating = str(sum(ratinglist)/(totalreviews))
 
                 
                 #mainlist.append(str(totalreviews))
@@ -553,16 +310,10 @@ def index10():
                 #mainlist.append(averagerating)
                 #mainlist.append(mod_string)
 
-                mainsublist = {'id': (i+1), 'name': (namelist[i]), 'totalrevs':totalreviews, 'posC': poscounter, 'negC': negcounter, 'avgRating':averagerating}
-                print(mainsublist)
-                mainlist.append(mainsublist)
+    mainsublist = {'id': (i+1), 'name': (namelist[i]), 'totalrevs':totalreviews, 'posC': poscounter, 'negC': negcounter, 'avgRating':averagerating}
+    print(mainsublist)
+    mainlist.append(mainsublist)
                             
-
-
-        
-    
-    
-
     c.close()
 
     
@@ -700,23 +451,23 @@ def test7():
 
         data = request.get_json(force=True, cache=True)
 
-        c.execute("SELECT * FROM productnames2")
+        #c.execute("SELECT * FROM productnames2")
 
-        productnames = c.fetchall()
-        conn.commit()
+        #productnames = c.fetchall()
+        #conn.commit()
 
-        c.close()
+        #c.close()
 
         klist = []
-        plist = []
+        #plist = []
 
         klist.append(data['search'])
     
-        for i in productnames:
-            plist.append(i[0])
-            print(i)
+        # for i in productnames:
+        #     plist.append(i[0])
+        #     print(i)
 
-        return keywordtable1(plist,klist)
+        return keywordtable1(klist)
         
         
         
@@ -750,106 +501,7 @@ def test8():
 @app.route("/test11")
 def index11():
 
-
-
-   try:
-    conn = mysql.connect()
-    conn.autocommit(True)
-    # c = conn.cursor(buffered=True)
-    c = mysql.get_db().cursor()
-    c.execute("SELECT * FROM productnames2")
-    names = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM marketplace")
-    marketplaces = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM vine")
-    vines = c.fetchall()
-    conn.commit()
-    
-
-    if names:
-        pass
-
-    namelist = []
-    marketplacelist = []
-    vinelist = []
-
-    for count, name in enumerate(names):
-        newname = str(name)
-        size = len(newname)
-        newname = newname[1:]
-        mod_string = newname[:size - 3]
-        namelist.append(str(mod_string))
-
-    for count, marketplace in enumerate(marketplaces):
-        newmarketplace = str(marketplace)
-        size = len(newmarketplace)
-        newmarketplace = newmarketplace[1:]
-        mod_string = newmarketplace[:size - 3]
-        marketplacelist.append(str(mod_string))
-
-    for count, vine in enumerate(vines):
-        newvine = str(vine)
-        size = len(newvine)
-        newvine = newvine[1:]
-        mod_string = newvine[:size - 3]
-        vinelist.append(str(mod_string))
-    
-    
-    query = ''
-    newquery = ''
-    if  len(namelist) > 0:
-        query = "SELECT * FROM reviews2 WHERE "
-        productquery = "product=("
-        productquery2 = ")"
-        marketplacequery = "marketplace=("
-        vinequery = "vine=("
-        andquery = ") AND "
-
-        
-
-        #if len(namelist) == 1 and len(marketplacelist) == 1 and len(vinelist) == 1:
-        #    newquery = productquery  + namelist[0] + productquery2 + andquery + marketplacequery + marketplacelist[0] + productquery2 + andquery + vinequery + vinelist[0] + productquery2
-
-        if len(namelist) >= 1 and len(marketplacelist) >= 1 and len(vinelist) >= 1:
-            for i in range(0,len(namelist)):
-              if i == 0:
-                newquery += "("  
-              newquery += productquery  + namelist[i] + productquery2
-
-              if i+1 != len(namelist):
-                newquery += " OR "
-              if i+1 == len(namelist):
-                newquery += andquery
-            for i in range(0,len(marketplacelist)):
-              if i == 0:
-                newquery += "("
-              newquery += marketplacequery  + marketplacelist[i] + productquery2 
-              if i+1 != len(marketplacelist):
-                newquery += " OR "
-              if i+1 == len(marketplacelist):
-                newquery += andquery
-            for i in range(0,len(vinelist)):
-              if i == 0:
-                newquery += "("
-              newquery += vinequery  + vinelist[i] + productquery2 
-              if i+1 != len(vinelist):
-                newquery += " OR "
-              if i+1 == len(vinelist):
-                newquery += ")"
-              
-
-    print(namelist)      
-    print(vinelist)
-    print(marketplacelist)
-    #print(newquery)
-    finalquery = query + newquery
-    print(newquery)
-    print(finalquery)  
-    c.execute(finalquery)
-
-    reviews = list(c.fetchall())
+    reviews = filter_reviews()
     #print(reviews)
     positivedict = {}
     positivedata = []
@@ -860,7 +512,7 @@ def index11():
         date = str(i[2])
         rating = str(i[4])
         product = str(i[0])
-        d = datetime.datetime.strptime(date, '%d %B %Y')
+        d = datetime.strptime(date, '%d %B %Y')
         formatteddate = (d.strftime("%B %Y"))
         sentiment = str(i[5])
         sentiment = ast.literal_eval(sentiment)
@@ -871,7 +523,7 @@ def index11():
 
             counter = counter + 1
         
-        floatrating = float(rating.replace(' out of 5 stars',''))
+        floatrating = float(rating)
         positivedict = {'product': product, 'sentiment': counter, 'date': formatteddate}
         positivedata.append(positivedict)
     
@@ -882,7 +534,7 @@ def index11():
     def count_monthly_mentions(data):
         count = defaultdict(lambda: defaultdict(int))
         for item in data:
-            date = datetime.datetime.strptime(item[2], '%d %B %Y')
+            date = datetime.strptime(item[2], '%d %B %Y')
             count[item[0]][date.strftime('%B %Y')] += 1
         return dict(count)
 
@@ -910,181 +562,14 @@ def index11():
         return sorted(avg_pos_comments, key=lambda x: x['date'])
 
     finaloutput = (avg_positive_comments(results_list, positivedata))
-    #finaloutput = avg_positive_comments(results_list, positivedata)
-
-#    print(result)
-
-    # for entry in positivedata:
-    #     product = entry['product']
-    #     rating = entry['rating']
-    #     date = datetime.datetime.strptime(entry['date'], '%B %Y')
-    #     month_year = date.strftime("%B %Y")
-
-    #     if month_year not in results:
-    #         results[month_year] = {}
-
-    #     if product not in results[month_year]:
-    #         results[month_year][product] = []
-
-    #     results[month_year][product].append(rating)
-
-    # averages = []
-
-    # for month_year, product_ratings in results.items():
-    #     monthly_averages = {'name': month_year}
-    #     for product, ratings in product_ratings.items():
-    #         monthly_averages[product] = f"{sum(ratings) / len(ratings):.1f}"
-    #     averages.append(monthly_averages)
-
-    # averages.sort(key=lambda x: datetime.datetime.strptime(x['name'], '%B %Y'))
-    # print(averages)
-    # conn.commit()
-
-
-    # productlist = []
-    # totalreviews = len(reviews)
-    # ratinglist = []
-    
-
-
-    # for i in reviews:
-    #    rating = str(i[4])
-    #    floatrating = float(rating.replace(' out of 5 stars',''))
-    #    ratinglist.append(floatrating)
-    #    sentiment = str(i[5])
-    #    sentiment = ast.literal_eval(sentiment)
-    #    if float(sentiment['neg']) > float(sentiment['pos']):
-    #         negcounter = negcounter + 1
-    #    else:
-    #         poscounter = poscounter + 1
-        
-    # averagerating = str(sum(ratinglist)/(totalreviews))
-
-    # posComments = 0
-    
-
-    # negComments = 0
-    
-
-    # mainlist.append(str(totalreviews))
-    # mainlist.append(poscounter)
-    # mainlist.append(negcounter)
-    # mainlist.append(averagerating)
-    # mainlist.append(posComments)
-    # mainlist.append(negComments)
-
-    c.close()
-
-    
     return finaloutput
-   except:
-    return 'test'
 
 
 
 @app.route("/avgnegativegraph")
 def avgnegativegraph():
 
-
-
-   try:
-    conn = mysql.connect()
-    conn.autocommit(True)
-    # c = conn.cursor(buffered=True)
-    c = mysql.get_db().cursor()
-    c.execute("SELECT * FROM productnames2")
-    names = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM marketplace")
-    marketplaces = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM vine")
-    vines = c.fetchall()
-    conn.commit()
-    
-
-    if names:
-        pass
-
-    namelist = []
-    marketplacelist = []
-    vinelist = []
-
-    for count, name in enumerate(names):
-        newname = str(name)
-        size = len(newname)
-        newname = newname[1:]
-        mod_string = newname[:size - 3]
-        namelist.append(str(mod_string))
-
-    for count, marketplace in enumerate(marketplaces):
-        newmarketplace = str(marketplace)
-        size = len(newmarketplace)
-        newmarketplace = newmarketplace[1:]
-        mod_string = newmarketplace[:size - 3]
-        marketplacelist.append(str(mod_string))
-
-    for count, vine in enumerate(vines):
-        newvine = str(vine)
-        size = len(newvine)
-        newvine = newvine[1:]
-        mod_string = newvine[:size - 3]
-        vinelist.append(str(mod_string))
-    
-    
-    query = ''
-    newquery = ''
-    if  len(namelist) > 0:
-        query = "SELECT * FROM reviews2 WHERE "
-        productquery = "product=("
-        productquery2 = ")"
-        marketplacequery = "marketplace=("
-        vinequery = "vine=("
-        andquery = ") AND "
-
-        
-
-        #if len(namelist) == 1 and len(marketplacelist) == 1 and len(vinelist) == 1:
-        #    newquery = productquery  + namelist[0] + productquery2 + andquery + marketplacequery + marketplacelist[0] + productquery2 + andquery + vinequery + vinelist[0] + productquery2
-
-        if len(namelist) >= 1 and len(marketplacelist) >= 1 and len(vinelist) >= 1:
-            for i in range(0,len(namelist)):
-              if i == 0:
-                newquery += "("  
-              newquery += productquery  + namelist[i] + productquery2
-
-              if i+1 != len(namelist):
-                newquery += " OR "
-              if i+1 == len(namelist):
-                newquery += andquery
-            for i in range(0,len(marketplacelist)):
-              if i == 0:
-                newquery += "("
-              newquery += marketplacequery  + marketplacelist[i] + productquery2 
-              if i+1 != len(marketplacelist):
-                newquery += " OR "
-              if i+1 == len(marketplacelist):
-                newquery += andquery
-            for i in range(0,len(vinelist)):
-              if i == 0:
-                newquery += "("
-              newquery += vinequery  + vinelist[i] + productquery2 
-              if i+1 != len(vinelist):
-                newquery += " OR "
-              if i+1 == len(vinelist):
-                newquery += ")"
-              
-
-    print(namelist)      
-    print(vinelist)
-    print(marketplacelist)
-    #print(newquery)
-    finalquery = query + newquery
-    print(newquery)
-    print(finalquery)  
-    c.execute(finalquery)
-
-    reviews = list(c.fetchall())
+    reviews = filter_reviews()
     #print(reviews)
     positivedict = {}
     positivedata = []
@@ -1095,7 +580,7 @@ def avgnegativegraph():
         date = str(i[2])
         rating = str(i[4])
         product = str(i[0])
-        d = datetime.datetime.strptime(date, '%d %B %Y')
+        d = datetime.strptime(date, '%d %B %Y')
         formatteddate = (d.strftime("%B %Y"))
         sentiment = str(i[5])
         sentiment = ast.literal_eval(sentiment)
@@ -1106,7 +591,7 @@ def avgnegativegraph():
 
             counter = counter + 1
         
-        floatrating = float(rating.replace(' out of 5 stars',''))
+        floatrating = float(rating)
         positivedict = {'product': product, 'sentiment': counter, 'date': formatteddate}
         positivedata.append(positivedict)
     
@@ -1117,7 +602,7 @@ def avgnegativegraph():
     def count_monthly_mentions(data):
         count = defaultdict(lambda: defaultdict(int))
         for item in data:
-            date = datetime.datetime.strptime(item[2], '%d %B %Y')
+            date = datetime.strptime(item[2], '%d %B %Y')
             count[item[0]][date.strftime('%B %Y')] += 1
         return dict(count)
 
@@ -1145,75 +630,8 @@ def avgnegativegraph():
         return sorted(avg_pos_comments, key=lambda x: x['date'])
 
     finaloutput = (avg_positive_comments(results_list, positivedata))
-    #finaloutput = avg_positive_comments(results_list, positivedata)
-
-#    print(result)
-
-    # for entry in positivedata:
-    #     product = entry['product']
-    #     rating = entry['rating']
-    #     date = datetime.datetime.strptime(entry['date'], '%B %Y')
-    #     month_year = date.strftime("%B %Y")
-
-    #     if month_year not in results:
-    #         results[month_year] = {}
-
-    #     if product not in results[month_year]:
-    #         results[month_year][product] = []
-
-    #     results[month_year][product].append(rating)
-
-    # averages = []
-
-    # for month_year, product_ratings in results.items():
-    #     monthly_averages = {'name': month_year}
-    #     for product, ratings in product_ratings.items():
-    #         monthly_averages[product] = f"{sum(ratings) / len(ratings):.1f}"
-    #     averages.append(monthly_averages)
-
-    # averages.sort(key=lambda x: datetime.datetime.strptime(x['name'], '%B %Y'))
-    # print(averages)
-    # conn.commit()
-
-
-    # productlist = []
-    # totalreviews = len(reviews)
-    # ratinglist = []
-    
-
-
-    # for i in reviews:
-    #    rating = str(i[4])
-    #    floatrating = float(rating.replace(' out of 5 stars',''))
-    #    ratinglist.append(floatrating)
-    #    sentiment = str(i[5])
-    #    sentiment = ast.literal_eval(sentiment)
-    #    if float(sentiment['neg']) > float(sentiment['pos']):
-    #         negcounter = negcounter + 1
-    #    else:
-    #         poscounter = poscounter + 1
-        
-    # averagerating = str(sum(ratinglist)/(totalreviews))
-
-    # posComments = 0
-    
-
-    # negComments = 0
-    
-
-    # mainlist.append(str(totalreviews))
-    # mainlist.append(poscounter)
-    # mainlist.append(negcounter)
-    # mainlist.append(averagerating)
-    # mainlist.append(posComments)
-    # mainlist.append(negComments)
-
-    c.close()
-
-    
     return finaloutput
-   except:
-    return 'test'
+
 
 
 
@@ -1248,109 +666,14 @@ def process_marketplace():
     else:
         return 'data1'
 
+
+
 @app.route("/dashboardfiltered")
 def dashboardFilter():
 
-   try:
-    conn = mysql.connect()
-    conn.autocommit(True)
-    # c = conn.cursor(buffered=True)
-    c = mysql.get_db().cursor()
-    c.execute("SELECT * FROM productnames2")
-    names = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM marketplace")
-    marketplaces = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM vine")
-    vines = c.fetchall()
-    conn.commit()
-    
-
-    if names:
-        pass
-
-    namelist = []
-    marketplacelist = []
-    vinelist = []
-
-    for count, name in enumerate(names):
-        newname = str(name)
-        size = len(newname)
-        newname = newname[1:]
-        mod_string = newname[:size - 3]
-        namelist.append(str(mod_string))
-
-    for count, marketplace in enumerate(marketplaces):
-        newmarketplace = str(marketplace)
-        size = len(newmarketplace)
-        newmarketplace = newmarketplace[1:]
-        mod_string = newmarketplace[:size - 3]
-        marketplacelist.append(str(mod_string))
-
-    for count, vine in enumerate(vines):
-        newvine = str(vine)
-        size = len(newvine)
-        newvine = newvine[1:]
-        mod_string = newvine[:size - 3]
-        vinelist.append(str(mod_string))
-    
-    
-    query = ''
-    newquery = ''
-    if  len(namelist) > 0:
-        query = "SELECT * FROM reviews2 WHERE "
-        productquery = "product=("
-        productquery2 = ")"
-        marketplacequery = "marketplace=("
-        vinequery = "vine=("
-        andquery = ") AND "
-
-        
-
-        #if len(namelist) == 1 and len(marketplacelist) == 1 and len(vinelist) == 1:
-        #    newquery = productquery  + namelist[0] + productquery2 + andquery + marketplacequery + marketplacelist[0] + productquery2 + andquery + vinequery + vinelist[0] + productquery2
-
-        if len(namelist) >= 1 and len(marketplacelist) >= 1 and len(vinelist) >= 1:
-            for i in range(0,len(namelist)):
-              if i == 0:
-                newquery += "("  
-              newquery += productquery  + namelist[i] + productquery2
-
-              if i+1 != len(namelist):
-                newquery += " OR "
-              if i+1 == len(namelist):
-                newquery += andquery
-            for i in range(0,len(marketplacelist)):
-              if i == 0:
-                newquery += "("
-              newquery += marketplacequery  + marketplacelist[i] + productquery2 
-              if i+1 != len(marketplacelist):
-                newquery += " OR "
-              if i+1 == len(marketplacelist):
-                newquery += andquery
-            for i in range(0,len(vinelist)):
-              if i == 0:
-                newquery += "("
-              newquery += vinequery  + vinelist[i] + productquery2 
-              if i+1 != len(vinelist):
-                newquery += " OR "
-              if i+1 == len(vinelist):
-                newquery += ")"
-              
-
-    print(namelist)      
-    print(vinelist)
-    print(marketplacelist)
-    #print(newquery)
-    finalquery = query + newquery
-    print(newquery)
-    print(finalquery)  
-    c.execute(finalquery)
-
-    reviews = list(c.fetchall())
+    reviews = filter_reviews()
     print(reviews)
-    conn.commit()
+
     mainlist = []
 
     totalreviews = len(reviews)
@@ -1361,7 +684,7 @@ def dashboardFilter():
     negcounter = 0
     for i in reviews:
        rating = str(i[4])
-       floatrating = float(rating.replace(' out of 5 stars',''))
+       floatrating = float(rating)
        ratinglist.append(floatrating)
        sentiment = str(i[5])
        sentiment = ast.literal_eval(sentiment)
@@ -1385,113 +708,10 @@ def dashboardFilter():
     mainlist.append(posComments)
     mainlist.append(negComments)
 
-    c.close()
+
 
     
     return mainlist
-   except:
-    return 'test'
-
-
-@app.route("/vinecounter")
-def vinecounter():
-
-   try:
-    conn = mysql.connect()
-    conn.autocommit(True)
-    # c = conn.cursor(buffered=True)
-    c = mysql.get_db().cursor()
-    c.execute("SELECT * FROM productnames2")
-    names = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM marketplaces")
-    marketplaces = c.fetchall()
-    conn.commit()
-
-
-    if names:
-        pass
-
-    namelist = []
-
-    for count, name in enumerate(names):
-        newname = str(name)
-        size = len(newname)
-        newname = newname[1:]
-        mod_string = newname[:size - 3]
-        namelist.append(str(mod_string))
-
-    marketplacelist = []
-
-    for count, market in enumerate(marketplaces):
-        newmarket = str(market)
-        size1 = len(newmarket)
-        newmarket = newmarket[1:]
-        mod_string1 = newmarket[:size1 - 3]
-        marketplacelist.append(str(mod_string1))
-
-
-    query = ''
-    newquery = ''
-    if  len(namelist) > 0:
-        query = "SELECT * FROM reviews1 WHERE "
-        productquery = " product=("
-        marketplacequery = " marketplace=("
-        andquery = 'AND'
-        productquery2 = ")"
-
-
-
-        if len(namelist) == 1:
-            newquery = productquery  + namelist[0] + productquery2
-
-        elif len(namelist) > 1:
-            for i in range(0,len(namelist)):
-              newquery += productquery  + namelist[i] + productquery2 
-              if i+1 != len(namelist):
-                newquery += "OR"
-
-
-
-
-    finalquery = query + newquery
-
-    c.execute(finalquery)
-
-    reviews = list(c.fetchall())
-
-    conn.commit()
-    mainlist = []
-
-    totalreviews = len(reviews)
-
-
-    ratinglist = []
-    poscounter = 0
-    negcounter = 0
-    for i in reviews:
-       rating = str(i[3])
-       floatrating = float(rating.replace(' out of 5 stars',''))
-       ratinglist.append(floatrating)
-       sentiment = str(i[4])
-       sentiment = ast.literal_eval(sentiment)
-       if float(sentiment['neg']) > float(sentiment['pos']):
-            negcounter = negcounter + 1
-       else:
-            poscounter = poscounter + 1
-
-    averagerating = str(sum(ratinglist)/(totalreviews))
-
-    mainlist.append(str(totalreviews))
-    mainlist.append(poscounter)
-    mainlist.append(negcounter)
-    mainlist.append(averagerating)
-    c.close()
-
-
-    return mainlist
-   except:
-    return 'test'
 
 
 
@@ -1505,10 +725,8 @@ def individualkeywordtable():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json') and (request.method == 'POST'):
         data = request.get_json(force=True, cache=True)
-        print(data[0])
-        keyword = 'wipes'
-
-        return individual_keyword(keyword)
+        print(data)
+        return individual_keyword(str(data))
 
     else:
         return 'data1'
@@ -1516,18 +734,37 @@ def individualkeywordtable():
 
 @app.route("/mainindividualkeywordtable")
 def mainindividualkeywordtable():
+    try:
         conn = mysql.connect()
         conn.autocommit(True)
         c = mysql.get_db().cursor()
         c.execute('SELECT * FROM keyword_specific')
         keywords = c.fetchall()
         conn.commit()
-        return jsonify(keywords)
+        mainlist = []
+        mainlist1= {}
+        idCounter = 1
+        for i in keywords:   
+            sentiment = str(i[5])
+            #print(i[2])
+            sentiment = ast.literal_eval(sentiment)
+            sentiment["pos"] = sentiment["pos"]*100
+            sentiment["neg"] = sentiment["neg"]*100
+            mainlist1 = {'id':idCounter, 'productname':(i[0]),'review':(i[1]),'date':(i[2]), 'marketplace': (i[3]), 'rating':i[4], 'positive':sentiment['pos'],'negative':sentiment['neg'], 'vine': i[6]}
+            print(mainlist1)
+            mainlist.append(mainlist1)
+            mainlist1 ={}
+            idCounter += 1
+        return mainlist
+        #return jsonify(keywords)
+    except:
+        return 'data1'
 
 
 
 @app.route("/mainindividualkeywordtablepositivecomments")
 def mainindividualkeywordtablepositivecomments():
+    try:
         conn = mysql.connect()
         conn.autocommit(True)
         c = mysql.get_db().cursor()
@@ -1562,11 +799,14 @@ def mainindividualkeywordtablepositivecomments():
             return avg_reviews
         
         return avg_pos_reviews(keywords)
+    except:
+        return 'data1'
 
 
 
 @app.route("/mainindividualkeywordtablenegativecomments")
 def mainindividualkeywordtablenegativecomments():
+    try:
         conn = mysql.connect()
         conn.autocommit(True)
         c = mysql.get_db().cursor()
@@ -1601,10 +841,13 @@ def mainindividualkeywordtablenegativecomments():
             return avg_reviews
         
         return avg_pos_reviews(keywords)
+    except:
+        return 'data1'
 
 
 @app.route("/mainindividualkeywordtabletotalcomments")
 def mainindividualkeywordtabletotalcomments():
+    try:
         conn = mysql.connect()
         conn.autocommit(True)
         c = mysql.get_db().cursor()
@@ -1624,115 +867,22 @@ def mainindividualkeywordtabletotalcomments():
         result = [{product: count, "date": date} for (product, date), count in sorted_review_count]
         
         return result
+    except:
+        return 'data1'
+
+
 
 
 @app.route("/dateaverages")
 def dateaverages():
 
-   try:
-    conn = mysql.connect()
-    conn.autocommit(True)
-    # c = conn.cursor(buffered=True)
-    c = mysql.get_db().cursor()
-    c.execute("SELECT * FROM productnames2")
-    names = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM marketplace")
-    marketplaces = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM vine")
-    vines = c.fetchall()
-    conn.commit()
-    
 
-    if names:
-        pass
-
-    namelist = []
-    marketplacelist = []
-    vinelist = []
-
-    for count, name in enumerate(names):
-        newname = str(name)
-        size = len(newname)
-        newname = newname[1:]
-        mod_string = newname[:size - 3]
-        namelist.append(str(mod_string))
-
-    for count, marketplace in enumerate(marketplaces):
-        newmarketplace = str(marketplace)
-        size = len(newmarketplace)
-        newmarketplace = newmarketplace[1:]
-        mod_string = newmarketplace[:size - 3]
-        marketplacelist.append(str(mod_string))
-
-    for count, vine in enumerate(vines):
-        newvine = str(vine)
-        size = len(newvine)
-        newvine = newvine[1:]
-        mod_string = newvine[:size - 3]
-        vinelist.append(str(mod_string))
-    
-    
-    query = ''
-    newquery = ''
-    if  len(namelist) > 0:
-        query = "SELECT * FROM reviews2 WHERE "
-        productquery = "product=("
-        productquery2 = ")"
-        marketplacequery = "marketplace=("
-        vinequery = "vine=("
-        andquery = ") AND "
-
-        
-
-        #if len(namelist) == 1 and len(marketplacelist) == 1 and len(vinelist) == 1:
-        #    newquery = productquery  + namelist[0] + productquery2 + andquery + marketplacequery + marketplacelist[0] + productquery2 + andquery + vinequery + vinelist[0] + productquery2
-
-        if len(namelist) >= 1 and len(marketplacelist) >= 1 and len(vinelist) >= 1:
-            for i in range(0,len(namelist)):
-              if i == 0:
-                newquery += "("  
-              newquery += productquery  + namelist[i] + productquery2
-
-              if i+1 != len(namelist):
-                newquery += " OR "
-              if i+1 == len(namelist):
-                newquery += andquery
-            for i in range(0,len(marketplacelist)):
-              if i == 0:
-                newquery += "("
-              newquery += marketplacequery  + marketplacelist[i] + productquery2 
-              if i+1 != len(marketplacelist):
-                newquery += " OR "
-              if i+1 == len(marketplacelist):
-                newquery += andquery
-            for i in range(0,len(vinelist)):
-              if i == 0:
-                newquery += "("
-              newquery += vinequery  + vinelist[i] + productquery2 
-              if i+1 != len(vinelist):
-                newquery += " OR "
-              if i+1 == len(vinelist):
-                newquery += ")"
-              
-
-    print(namelist)      
-    print(vinelist)
-    print(marketplacelist)
-    #print(newquery)
-    finalquery = query + newquery
-    print(newquery)
-    print(finalquery)  
-    c.execute(finalquery)
-
-    reviews = list(c.fetchall())
+    reviews = filter_reviews()
     print(reviews)
-    conn.commit()
     def average_rating(data, num_days=7, num_months=6, num_years=1):
         now = datetime.now()
         ratings = {}
-        for duration, num_units in zip(['7-day', '6-month', '1-year'], [num_days, num_months * 30, num_years * 365]):
+        for duration, num_units in zip(['1-month', '6-month', '1-year'], [num_days*4, num_months * 30, num_years * 365]):
             ratings[duration] = sum(float(item[4]) for item in data if (now - datetime.strptime(item[2], '%d %B %Y')).days <= num_units) / len([item[4] for item in data if (now - datetime.strptime(item[2], '%d %B %Y')).days <= num_units]) if [item[4] for item in data if (now - datetime.strptime(item[2], '%d %B %Y')).days <= num_units] else None
         return ratings
 
@@ -1751,119 +901,18 @@ def dateaverages():
     else:
         print("No product can be recommended as there are no positive reviews")
 
-    c.close()
 
     mainlist = []
     mainlist.append(average_rating(reviews))
     mainlist.append(recommended_product)
     return jsonify(mainlist)
-   except:
-    return 'test'
+
 
 
 @app.route("/volumegraph")
 def volumegraph():
 
-   try:
-    conn = mysql.connect()
-    conn.autocommit(True)
-    # c = conn.cursor(buffered=True)
-    c = mysql.get_db().cursor()
-    c.execute("SELECT * FROM productnames2")
-    names = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM marketplace")
-    marketplaces = c.fetchall()
-    conn.commit()
-    c.execute("SELECT * FROM vine")
-    vines = c.fetchall()
-    conn.commit()
-    
-
-    if names:
-        pass
-
-    namelist = []
-    marketplacelist = []
-    vinelist = []
-
-    for count, name in enumerate(names):
-        newname = str(name)
-        size = len(newname)
-        newname = newname[1:]
-        mod_string = newname[:size - 3]
-        namelist.append(str(mod_string))
-
-    for count, marketplace in enumerate(marketplaces):
-        newmarketplace = str(marketplace)
-        size = len(newmarketplace)
-        newmarketplace = newmarketplace[1:]
-        mod_string = newmarketplace[:size - 3]
-        marketplacelist.append(str(mod_string))
-
-    for count, vine in enumerate(vines):
-        newvine = str(vine)
-        size = len(newvine)
-        newvine = newvine[1:]
-        mod_string = newvine[:size - 3]
-        vinelist.append(str(mod_string))
-    
-    
-    query = ''
-    newquery = ''
-    if  len(namelist) > 0:
-        query = "SELECT * FROM reviews2 WHERE "
-        productquery = "product=("
-        productquery2 = ")"
-        marketplacequery = "marketplace=("
-        vinequery = "vine=("
-        andquery = ") AND "
-
-        
-
-        #if len(namelist) == 1 and len(marketplacelist) == 1 and len(vinelist) == 1:
-        #    newquery = productquery  + namelist[0] + productquery2 + andquery + marketplacequery + marketplacelist[0] + productquery2 + andquery + vinequery + vinelist[0] + productquery2
-
-        if len(namelist) >= 1 and len(marketplacelist) >= 1 and len(vinelist) >= 1:
-            for i in range(0,len(namelist)):
-              if i == 0:
-                newquery += "("  
-              newquery += productquery  + namelist[i] + productquery2
-
-              if i+1 != len(namelist):
-                newquery += " OR "
-              if i+1 == len(namelist):
-                newquery += andquery
-            for i in range(0,len(marketplacelist)):
-              if i == 0:
-                newquery += "("
-              newquery += marketplacequery  + marketplacelist[i] + productquery2 
-              if i+1 != len(marketplacelist):
-                newquery += " OR "
-              if i+1 == len(marketplacelist):
-                newquery += andquery
-            for i in range(0,len(vinelist)):
-              if i == 0:
-                newquery += "("
-              newquery += vinequery  + vinelist[i] + productquery2 
-              if i+1 != len(vinelist):
-                newquery += " OR "
-              if i+1 == len(vinelist):
-                newquery += ")"
-              
-
-    print(namelist)      
-    print(vinelist)
-    print(marketplacelist)
-    #print(newquery)
-    finalquery = query + newquery
-    print(newquery)
-    print(finalquery)  
-    c.execute(finalquery)
-
-    reviews = c.fetchall()
-    # print(reviews)
-    conn.commit()
+    reviews = filter_reviews()
     def transform_date(date_str):
         date_obj = datetime.strptime(date_str, '%d %B %Y')
         return date_obj.strftime("%B %Y")
@@ -1876,12 +925,59 @@ def volumegraph():
 
     result = [{product: count, "date": date} for (product, date), count in sorted_review_count]
 
-    c.close()
 
     
     return result
-   except:
-    return 'test'
+
+
+
+@app.route("/comparepage")
+def comparepage():
+
+    input_list = filter_reviews()
+    product_dict = defaultdict(lambda: {'total_reviews': 0, 'positive_comments': 0, 'negative_comments': 0, 'average_rating': 0, 'vine_reviews': 0, 'verified_purchases': 0, 'non_verified_purchases': 0})
+
+    for product_name, review, date, marketplace, rating, sentiment, product_type in input_list:
+        rating = float(rating)
+        sentiment_dict = eval(sentiment)
+        sentiment_score = sentiment_dict['pos'] - sentiment_dict['neg']
+        if sentiment_score > 0:
+            product_dict[product_name]['positive_comments'] += 1
+        elif sentiment_score < 0:
+            product_dict[product_name]['negative_comments'] += 1
+        product_dict[product_name]['total_reviews'] += 1
+        product_dict[product_name]['average_rating'] += rating
+        if product_type == 'Vine':
+            product_dict[product_name]['vine_reviews'] += 1
+        elif product_type == 'Verified Purchase':
+            product_dict[product_name]['verified_purchases'] += 1
+        elif product_type == 'Non-Verified Purchase':
+            product_dict[product_name]['non_verified_purchases'] += 1
+
+    # calculate average rating
+    for product_name in product_dict:
+        if product_dict[product_name]['total_reviews'] > 0:
+            product_dict[product_name]['average_rating'] /= product_dict[product_name]['total_reviews']
+
+    # sort the product_dict by positive_comments and average_rating
+    sorted_products = sorted(product_dict.items(), key=lambda x: (-x[1]['positive_comments'], -x[1]['average_rating']))
+
+
+    def get_ranking(item):
+        average_rating = item[1]['average_rating']
+        positive_comments = item[1]['positive_comments']
+        negative_comments = item[1]['negative_comments']
+        sentiment_bias = (positive_comments - negative_comments) / (positive_comments + negative_comments)
+        return average_rating * sentiment_bias
+
+    data_with_ranking = sorted(sorted_products, key=get_ranking, reverse=True)
+
+    for i, item in enumerate(data_with_ranking):
+        item[1]['ranking'] = i + 1
+
+    print(data_with_ranking)
+    return data_with_ranking
+
 
 
 if __name__ == "__main__":
