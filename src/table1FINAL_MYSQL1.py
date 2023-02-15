@@ -116,7 +116,7 @@ def keywordtable(data):
             reviewlist = {"product":row[0], "review":row[1], "date":row[2], "rating":row[4]}
             if keyword in reviewlist['review']:
                 allreviews1.append(str(reviewlist['review']))
-                newrating = float(str(reviewlist['rating']))
+                newrating = round(float(str(reviewlist['rating'])),2)
                 ratinglist.append(newrating)
                 counter = counter + 1
             reviewlist = {}

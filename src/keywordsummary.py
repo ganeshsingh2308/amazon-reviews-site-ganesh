@@ -54,5 +54,3 @@ def keywordsummary():
     conn.close()
     c.close()
     return generate_summary(keywords)
-
-print(keywordtable1())
