@@ -3,8 +3,26 @@ import mysql.connector
 import json
 from filterreviews import filter_reviews
 conn = mysql.connector.connect(host="localhost",user='root',password='root123',database='main') 
+import nltk
+import spacy
+
+nltk.download('punkt')
+
+nlp = spacy.load('en_core_web_sm')
 
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+nlp = spacy.load('en_core_web_sm')
+
+def find_sentences_with_keyword(reviews, keyword):
+    keyword = keyword.lower()
+    sentences_with_keyword = []
+    sentences = nltk.sent_tokenize(reviews)
+    for sentence in sentences:
+        doc = nlp(sentence)
+        if any(token.text.lower() == keyword or token.lemma_.lower() == keyword for token in doc):
+            sentences_with_keyword.append(sentence)
+    return sentences_with_keyword
 
 
 def keywordtable(data):
@@ -22,7 +40,7 @@ def keywordtable(data):
        size = len(newname)
        newname = newname[1:]
        mod_string = newname[:size - 3]
-       print(str(mod_string))
+       #print(str(mod_string))
 
     commandlistcounter = 0
     counter = 0
@@ -38,8 +56,8 @@ def keywordtable(data):
 
     for i in range(0,len(commandlistnew[0])):
        counter = counter + 1
-       print(i)
-       print(commandlistnew[0][i])
+       #print(i)
+       #print(commandlistnew[0][i])
        c.execute("INSERT INTO productnames2 (product) VALUES (%s)",(json.loads("["+'"'+commandlistnew[0][i]+'"'+"]")))
        c.stored_results()
        conn.commit()
@@ -55,7 +73,7 @@ def keywordtable(data):
         review = {"product":row[0], "review":row[1], "date":row[2], "rating":row[4]}
         review1 = str(review['review'])
         # review2 = review1.lstrip(review1[0]).rstrip(review1[-1])
-        print(review1)
+        #print(review1)
         allreviews.append(review1)
     
     print(reviewcounter)
@@ -86,7 +104,7 @@ def keywordtable(data):
 
     extractor = Extractor(spacy_model="en_core_web_trf")
     keywords = extractor.generate(allreviews,top_k=keywordnumber)
-    print(keywords)
+    #print(keywords)
 
     datelist = []
     ratinglist = []
@@ -104,7 +122,14 @@ def keywordtable(data):
             reviewlist = {}
         averagerating = str(sum(ratinglist)/(len(ratinglist)))
         allreviews1 =' '.join(allreviews1)
-        sent_1 = str(sentiment.polarity_scores(allreviews1))
+        #print(allreviews1)
+        #print('\n')
+        #sent_1 = str(sentiment.polarity_scores(allreviews1))
+        sent_1 = str(sentiment.polarity_scores(find_sentences_with_keyword(allreviews1, keyword)))
+        if len(find_sentences_with_keyword(allreviews1, keyword)) != 0:
+            counter = len(find_sentences_with_keyword(allreviews1, keyword))
+        print(find_sentences_with_keyword(allreviews1, keyword))
+
         c.execute("INSERT INTO keywords (keyword,Mentions,sentiment,averagerating) VALUES (%s,%s,%s,%s)",(keyword, counter, sent_1, averagerating))
         conn.commit()
         
@@ -116,3 +141,5 @@ def keywordtable(data):
     c.close()
     return 'test'
 
+data = ['Fellowes Touch Screen Cleaning Wipes Suitable for Tablet, Smartphone, E-Reader and Gaming Screens - Pack of 20 Biodegradable Screen Wipes, 9933501']
+print(keywordtable(data))
